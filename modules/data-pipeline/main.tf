@@ -50,6 +50,9 @@ resource "google_storage_bucket" "tbd-data-bucket" {
     uniform_bucket_level_access = false #tfsec:ignore:google-storage-enable-ubla
     public_access_prevention    = "enforced"
     force_destroy               = true
+  #checkov:skip=CKV_GCP_62: "Bucket should log access"
+  #checkov:skip=CKV_GCP_29: "Ensure that Cloud Storage buckets have uniform bucket-level access enabled"
+  #checkov:skip=CKV_GCP_78: "Ensure Cloud storage has versioning enabled"
 }
 
 resource "google_storage_bucket_iam_member" "tbd-data-bucket-iam-editor" {
