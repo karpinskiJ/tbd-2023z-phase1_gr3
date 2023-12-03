@@ -70,7 +70,7 @@ resource "google_notebooks_instance" "tbd_notebook" {
   }
   post_startup_script = "gs://${google_storage_bucket_object.post-startup.bucket}/${google_storage_bucket_object.post-startup.name}"
 
-  google_notebooks_instance {
+  shielded_instance_config {
     enable_secure_boot = true
   }
 }
