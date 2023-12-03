@@ -171,6 +171,7 @@ spark = SparkSession.builder.appName('Shakespeare WordCount').getOrCreate()
     - [modules/dataproc/variables.tf](modules/dataproc/variables.tf)
     - [modules/vertex-ai-workbench/main.tf](modules/vertex-ai-workbench/main.tf)
     - [modules/vertex-ai-workbench/variables.tf](modules/vertex-ai-workbench/variables.tf)
+    - [main.tf](main.tf)
 
     Modified code:
 
@@ -249,6 +250,50 @@ spark = SparkSession.builder.appName('Shakespeare WordCount').getOrCreate()
     +  description = "Machine type to use for notebook instance"
      }
     \ No newline at end of file
+    diff --git a/main.tf b/main.tf
+    index 9ca729b..05c64de 100644
+    --- a/main.tf
+    +++ b/main.tf
+    @@ -32,12 +32,13 @@ module "jupyter_docker_image" {
+     }
+    
+     module "vertex_ai_workbench" {
+    -  depends_on   = [module.jupyter_docker_image, module.vpc]
+    -  source       = "./modules/vertex-ai-workbench"
+    -  project_name = var.project_name
+    -  region       = var.region
+    -  network      = module.vpc.network.network_id
+    -  subnet       = module.vpc.subnets[local.notebook_subnet_id].id
+    +  depends_on                = [module.jupyter_docker_image, module.vpc]
+    +  source                    = "./modules/vertex-ai-workbench"
+    +  project_name              = var.project_name
+    +  region                    = var.region
+    +  network                   = module.vpc.network.network_id
+    +  subnet                    = module.vpc.subnets[local.notebook_subnet_id].id
+    +  ai_notebook_instance_type = "e2-standard-2"
+    
+       ai_notebook_instance_owner = var.ai_notebook_instance_owner
+       ## To remove before workshop
+    @@ -49,12 +50,13 @@ module "vertex_ai_workbench" {
+    
+     #
+     module "dataproc" {
+    -  depends_on   = [module.vpc]
+    -  source       = "./modules/dataproc"
+    -  project_name = var.project_name
+    -  region       = var.region
+    -  subnet       = module.vpc.subnets[local.notebook_subnet_id].id
+    -  machine_type = "e2-standard-2"
+    +  depends_on          = [module.vpc]
+    +  source              = "./modules/dataproc"
+    +  project_name        = var.project_name
+    +  region              = var.region
+    +  subnet              = module.vpc.subnets[local.notebook_subnet_id].id
+    +  master_machine_type = "e2-standard-2"
+    +  worker_machine_type = "e2-standard-2"
+     }
+    
+     ## Uncomment for Dataproc batches (serverless)
     ```
     
     2. Add support for preemptible/spot instances in a Dataproc cluster
@@ -305,7 +350,7 @@ spark = SparkSession.builder.appName('Shakespeare WordCount').getOrCreate()
        }
        post_startup_script = "gs://${google_storage_bucket_object.post-startup.bucket}/$    {google_storage_bucket_object.post-startup.name}"
     +
-    +  google_notebooks_instance {
+    +  shielded_instance_config {
     +    enable_secure_boot = true
     +  }
      }
