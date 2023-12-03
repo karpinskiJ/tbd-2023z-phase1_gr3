@@ -170,11 +170,63 @@ spark = SparkSession.builder.appName('Shakespeare WordCount').getOrCreate()
     
     2. Add support for preemptible/spot instances in a Dataproc cluster
 
-    ***place the link to the modified file and inserted terraform code***
+    Modified file: [modules/dataproc/main.tf](modules/dataproc/main.tf)
+
+    Modified code:
+
+    ```diff
+    diff --git a/modules/dataproc/main.tf b/modules/dataproc/main.tf
+    index 4e70d01..b46a162 100644
+    --- a/modules/dataproc/main.tf
+    +++ b/modules/dataproc/main.tf
+    @@ -41,7 +41,7 @@ resource "google_dataproc_cluster" "tbd-dataproc-cluster" {
+         }
+    
+         worker_config {
+    -      num_instances = 2
+    +      num_instances = 1
+           machine_type  = var.machine_type
+           disk_config {
+             boot_disk_type    = "pd-standard"
+    @@ -49,5 +49,9 @@ resource "google_dataproc_cluster" "tbd-dataproc-cluster" {
+           }
+    
+         }
+    +
+    +    preemptible_worker_config {
+    +      num_instances = 1
+    +    }
+       }
+     }
+    \ No newline at end of file
+    ```
+
+    Since one normal instance is required, only one preemptible instance is created.
     
     3. Perform additional hardening of Jupyterlab environment, i.e. disable sudo access and enable secure boot
     
-    ***place the link to the modified file and inserted terraform code***
+    Modified file: [modules/vertex-ai-workbench/main.tf](modules/vertex-ai-workbench/main.tf)
+
+    Modified code:
+
+    ```diff
+    diff --git a/modules/vertex-ai-workbench/main.tf b/modules/vertex-ai-workbench/main.tf
+    index c47e79a..019bad3 100644
+    --- a/modules/vertex-ai-workbench/main.tf
+    +++ b/modules/vertex-ai-workbench/main.tf
+    @@ -66,8 +66,13 @@ resource "google_notebooks_instance" "tbd_notebook" {
+       instance_owners = [var.ai_notebook_instance_owner]
+       metadata = {
+         vmDnsSetting : "GlobalDefault"
+    +    notebook-disable-root = true
+       }
+       post_startup_script = "gs://${google_storage_bucket_object.post-startup.bucket}/$    {google_storage_bucket_object.post-startup.name}"
+    +
+    +  google_notebooks_instance {
+    +    enable_secure_boot = true
+    +  }
+     }
+    ```
 
     4. (Optional) Get access to Apache Spark WebUI
 
