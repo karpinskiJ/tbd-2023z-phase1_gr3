@@ -334,7 +334,7 @@ spark = SparkSession.builder.appName('Shakespeare WordCount').getOrCreate()
     +
     +    preemptible_worker_config {
     +      num_instances = 2
-    +      preemptibility = SPOT
+    +      preemptibility = "SPOT"
     +    }
        }
      }
