@@ -307,26 +307,6 @@ spark = SparkSession.builder.appName('Shakespeare WordCount').getOrCreate()
     index 4e70d01..b46a162 100644
     --- a/modules/dataproc/main.tf
     +++ b/modules/dataproc/main.tf
-    @@ -17,6 +17,10 @@ resource "google_dataproc_cluster" "tbd-dataproc-cluster" {
-         #    }
-         software_config {
-           image_version = var.image_version
-    +
-    +      override_properties = {
-    +        "dataproc:dataproc.allow.zero.workers" = "true"
-    +      }
-         }
-         gce_cluster_config {
-           subnetwork       = var.subnet
-    @@ -41,7 +45,7 @@ resource "google_dataproc_cluster" "tbd-dataproc-cluster" {
-         }
-    
-         worker_config {
-    -      num_instances = 2
-    +      num_instances = 0
-           machine_type  = var.machine_type
-           disk_config {
-             boot_disk_type    = "pd-standard"
     @@ -51,5 +55,9 @@ resource "google_dataproc_cluster" "tbd-dataproc-cluster" {
            }
     
@@ -341,7 +321,7 @@ spark = SparkSession.builder.appName('Shakespeare WordCount').getOrCreate()
     \ No newline at end of file
     ```
 
-    Both normal instances were replaced with preemptible instances.
+    Preemptible instances can be added as secondary workers.
     
     3. Perform additional hardening of Jupyterlab environment, i.e. disable sudo access and enable secure boot
     

@@ -17,10 +17,6 @@ resource "google_dataproc_cluster" "tbd-dataproc-cluster" {
     #    }
     software_config {
       image_version = var.image_version
-
-      override_properties = {
-        "dataproc:dataproc.allow.zero.workers" = "true"
-      }
     }
     gce_cluster_config {
       subnetwork       = var.subnet
@@ -45,7 +41,7 @@ resource "google_dataproc_cluster" "tbd-dataproc-cluster" {
     }
 
     worker_config {
-      num_instances = 0
+      num_instances = 2
       machine_type  = var.worker_machine_type
       disk_config {
         boot_disk_type    = "pd-standard"
