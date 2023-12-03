@@ -148,8 +148,19 @@ resource "google_storage_bucket_iam_member" "tbd-data-bucket-iam-editor" {
     ***place the screenshot of notebook here***
    
 13. Find and correct the error in spark-job.py
+    The airflow dag has failed because of the error in spark-joby.py script - the target location for data pointed to
+    bucket which did not exist. Bucket name has been changed as shown below. In result airflow task succeeded and data
+    has been saved to tbd-2023z-1000-data bucket at tbd-2023z-1000-data/data/shakespeare.
+   ```
+# change to your data bucket
+DATA_BUCKET = "gs://tbd-2023z-1000-data/data/shakespeare/"
+spark = SparkSession.builder.appName('Shakespeare WordCount').getOrCreate()
+```
 
-    ***describe the cause and how to find the error***
+![saved_shakespeare](/doc/figures/saved_shakespeare.png/)
+
+![saved_shakespeare](/doc/figures/airflow_success.png/)
+
 
 14. Additional tasks using Terraform:
 
