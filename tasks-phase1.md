@@ -166,15 +166,195 @@ spark = SparkSession.builder.appName('Shakespeare WordCount').getOrCreate()
 
     1. Add support for arbitrary machine types and worker nodes for a Dataproc cluster and JupyterLab instance
 
-    ***place the link to the modified file and inserted terraform code***
+    Modified files:
+    - [modules/dataproc/main.tf](modules/dataproc/main.tf)
+    - [modules/dataproc/variables.tf](modules/dataproc/variables.tf)
+    - [modules/vertex-ai-workbench/main.tf](modules/vertex-ai-workbench/main.tf)
+    - [modules/vertex-ai-workbench/variables.tf](modules/vertex-ai-workbench/variables.tf)
+    - [main.tf](main.tf)
+
+    Modified code:
+
+    ```diff
+    diff --git a/modules/dataproc/main.tf b/modules/dataproc/main.tf
+    index b46a162..6834873 100644
+    --- a/modules/dataproc/main.tf
+    +++ b/modules/dataproc/main.tf
+    @@ -33,7 +33,7 @@ resource "google_dataproc_cluster" "tbd-dataproc-cluster" {
+    
+         master_config {
+           num_instances = 1
+    -      machine_type  = var.machine_type
+    +      machine_type  = var.master_machine_type
+           disk_config {
+             boot_disk_type    = "pd-standard"
+             boot_disk_size_gb = 100
+    @@ -42,7 +42,7 @@ resource "google_dataproc_cluster" "tbd-dataproc-cluster" {
+    
+         worker_config {
+           num_instances = 1
+    -      machine_type  = var.machine_type
+    +      machine_type  = var.worker_machine_type
+           disk_config {
+             boot_disk_type    = "pd-standard"
+             boot_disk_size_gb = 100
+    diff --git a/modules/dataproc/variables.tf b/modules/dataproc/variables.tf
+    index 61eadd1..ac2367c 100644
+    --- a/modules/dataproc/variables.tf
+    +++ b/modules/dataproc/variables.tf
+    @@ -14,10 +14,16 @@ variable "subnet" {
+       description = "VPC subnet used for deployment"
+     }
+    
+    -variable "machine_type" {
+    +variable "master_machine_type" {
+       type        = string
+       default     = "e2-medium"
+    -  description = "Machine type to use for both worker and master nodes"
+    +  description = "Machine type to use for master nodes"
+    +}
+    +
+    +variable "worker_machine_type" {
+    +  type        = string
+    +  default     = "e2-medium"
+    +  description = "Machine type to use for worker nodes"
+     }
+    
+     variable "image_version" {
+    diff --git a/modules/vertex-ai-workbench/main.tf b/modules/vertex-ai-workbench/main.tf
+    index 019bad3..cbb5f0d 100644
+    --- a/modules/vertex-ai-workbench/main.tf
+    +++ b/modules/vertex-ai-workbench/main.tf
+    @@ -50,7 +50,7 @@ resource "google_notebooks_instance" "tbd_notebook" {
+       #checkov:skip=CKV2_GCP_18: "Ensure GCP network defines a firewall and does not use the default     firewall"
+       depends_on   = [google_project_service.notebooks]
+       location     = local.zone
+    -  machine_type = "e2-standard-2"
+    +  machine_type = var.ai_notebook_instance_type
+       name         = "${var.project_name}-notebook"
+       container_image {
+         repository = var.ai_notebook_image_repository
+    diff --git a/modules/vertex-ai-workbench/variables.tf b/modules/vertex-ai-workbench/variables.tf
+    index df21f7b..77e8929 100644
+    --- a/modules/vertex-ai-workbench/variables.tf
+    +++ b/modules/vertex-ai-workbench/variables.tf
+    @@ -32,4 +32,10 @@ variable "ai_notebook_image_repository" {
+     variable "ai_notebook_image_tag" {
+       type    = string
+       default = "latest"
+    +}
+    +
+    +variable "ai_notebook_instance_type" {
+    +  type        = string
+    +  default     = "e2-standard-2"
+    +  description = "Machine type to use for notebook instance"
+     }
+    \ No newline at end of file
+    diff --git a/main.tf b/main.tf
+    index 9ca729b..05c64de 100644
+    --- a/main.tf
+    +++ b/main.tf
+    @@ -32,12 +32,13 @@ module "jupyter_docker_image" {
+     }
+    
+     module "vertex_ai_workbench" {
+    -  depends_on   = [module.jupyter_docker_image, module.vpc]
+    -  source       = "./modules/vertex-ai-workbench"
+    -  project_name = var.project_name
+    -  region       = var.region
+    -  network      = module.vpc.network.network_id
+    -  subnet       = module.vpc.subnets[local.notebook_subnet_id].id
+    +  depends_on                = [module.jupyter_docker_image, module.vpc]
+    +  source                    = "./modules/vertex-ai-workbench"
+    +  project_name              = var.project_name
+    +  region                    = var.region
+    +  network                   = module.vpc.network.network_id
+    +  subnet                    = module.vpc.subnets[local.notebook_subnet_id].id
+    +  ai_notebook_instance_type = "e2-standard-2"
+    
+       ai_notebook_instance_owner = var.ai_notebook_instance_owner
+       ## To remove before workshop
+    @@ -49,12 +50,13 @@ module "vertex_ai_workbench" {
+    
+     #
+     module "dataproc" {
+    -  depends_on   = [module.vpc]
+    -  source       = "./modules/dataproc"
+    -  project_name = var.project_name
+    -  region       = var.region
+    -  subnet       = module.vpc.subnets[local.notebook_subnet_id].id
+    -  machine_type = "e2-standard-2"
+    +  depends_on          = [module.vpc]
+    +  source              = "./modules/dataproc"
+    +  project_name        = var.project_name
+    +  region              = var.region
+    +  subnet              = module.vpc.subnets[local.notebook_subnet_id].id
+    +  master_machine_type = "e2-standard-2"
+    +  worker_machine_type = "e2-standard-2"
+     }
+    
+     ## Uncomment for Dataproc batches (serverless)
+    ```
     
     2. Add support for preemptible/spot instances in a Dataproc cluster
 
-    ***place the link to the modified file and inserted terraform code***
+    Modified file: [modules/dataproc/main.tf](modules/dataproc/main.tf)
+
+    Modified code:
+
+    ```diff
+    diff --git a/modules/dataproc/main.tf b/modules/dataproc/main.tf
+    index 4e70d01..b46a162 100644
+    --- a/modules/dataproc/main.tf
+    +++ b/modules/dataproc/main.tf
+    @@ -41,7 +41,7 @@ resource "google_dataproc_cluster" "tbd-dataproc-cluster" {
+         }
+    
+         worker_config {
+    -      num_instances = 2
+    +      num_instances = 1
+           machine_type  = var.machine_type
+           disk_config {
+             boot_disk_type    = "pd-standard"
+    @@ -49,5 +49,9 @@ resource "google_dataproc_cluster" "tbd-dataproc-cluster" {
+           }
+    
+         }
+    +
+    +    preemptible_worker_config {
+    +      num_instances = 1
+    +    }
+       }
+     }
+    \ No newline at end of file
+    ```
+
+    Since one normal instance is required, only one preemptible instance is created.
     
     3. Perform additional hardening of Jupyterlab environment, i.e. disable sudo access and enable secure boot
     
-    ***place the link to the modified file and inserted terraform code***
+    Modified file: [modules/vertex-ai-workbench/main.tf](modules/vertex-ai-workbench/main.tf)
+
+    Modified code:
+
+    ```diff
+    diff --git a/modules/vertex-ai-workbench/main.tf b/modules/vertex-ai-workbench/main.tf
+    index c47e79a..019bad3 100644
+    --- a/modules/vertex-ai-workbench/main.tf
+    +++ b/modules/vertex-ai-workbench/main.tf
+    @@ -66,8 +66,13 @@ resource "google_notebooks_instance" "tbd_notebook" {
+       instance_owners = [var.ai_notebook_instance_owner]
+       metadata = {
+         vmDnsSetting : "GlobalDefault"
+    +    notebook-disable-root = true
+       }
+       post_startup_script = "gs://${google_storage_bucket_object.post-startup.bucket}/$    {google_storage_bucket_object.post-startup.name}"
+    +
+    +  shielded_instance_config {
+    +    enable_secure_boot = true
+    +  }
+     }
+    ```
 
     4. (Optional) Get access to Apache Spark WebUI
 
