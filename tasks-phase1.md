@@ -64,14 +64,17 @@ resource "google_storage_bucket_iam_member" "tbd-data-bucket-iam-editor" {
 
 
 6. Analyze terraform code. Play with terraform plan, terraform graph to investigate different modules.
-
-    ***describe one selected module and put the output of terraform graph for this module here***
    
-7. Reach YARN UI
+    ***describe one selected module and put the output of terraform graph for this module here***
+   ![alt text](/doc/figures/dataproc.png)
+   Dataproc is a fully managed Hadoop and Spark service that simplifies data processing. Automation allows for the quick creation and management of clusters, enabling you to focus on your data and applications, and save money through the option to turn clusters on and off.  
+     
+    Additionally, Dataproc makes it easier to use Hadoop and Spark, reduces costs, is scalable, reduces complexity, and enhances performance.
+8. Reach YARN UI
    ![alt text](/doc/figures/yarn_ui.png)
    
    
-8. Draw an architecture diagram (e.g. in draw.io) that includes:
+9. Draw an architecture diagram (e.g. in draw.io) that includes:
    1. VPC topology with service assignment to subnets
     ![alt text](/doc/figures/vpc_topology.png)
     2. Description of the components of service accounts
@@ -93,7 +96,7 @@ resource "google_storage_bucket_iam_member" "tbd-data-bucket-iam-editor" {
   
     
 
-9. Add costs by entering the expected consumption into Infracost
+10. Add costs by entering the expected consumption into Infracost
 
    Considering the current usage in the project, the following values were chosen:
 
@@ -103,7 +106,7 @@ resource "google_storage_bucket_iam_member" "tbd-data-bucket-iam-editor" {
 
    ![infracost tally](/doc/figures/2023z/09-infracost-breakdopw.png)
 
-10. Some resources are not supported by infracost yet. Estimate manually total costs of infrastructure based on pricing costs for region used in the project. Include costs of cloud composer, dataproc and AI vertex workbanch and them to infracost estimation.
+11. Some resources are not supported by infracost yet. Estimate manually total costs of infrastructure based on pricing costs for region used in the project. Include costs of cloud composer, dataproc and AI vertex workbanch and them to infracost estimation.
 
     ![composer resources](/doc/figures/2023z/10-costs-composer.png)
     ![vertex AI resources](/doc/figures/2023z/10-costs-vertexai.png)
@@ -137,17 +140,24 @@ resource "google_storage_bucket_iam_member" "tbd-data-bucket-iam-editor" {
 
     The overall cost optimization strategy would be to minimize runtime of all components or optimizing the amount of allocated storage to dataproc and composer instances. Further option is to automatically destroy all compute resources once a training session is over.
     
-11. Create a BigQuery dataset and an external table
-    
-    ***place the code and output here***
+12. Create a BigQuery dataset and an external table
+    ***place the code and output here***  
+    ![alt text](/doc/figures/dataset_table.png)
+    ![alt text](/doc/figures/bq_show.png)
+    Code: 
+    ```
+    bq mk my_dataset
+    bq mk --table --external_table_definition=@ORC=gs://bucket_orc/orc-file-11-format.orc dataset.table_1
+    bq show dataset.table_1 
+    ```
+    ***why does ORC not require a table schema?***  
+    Table scheme is already provided in orc file.
+    ORC also stores metadata about the file, such as the schema, at the end of the file.
+13. Start an interactive session from Vertex AI workbench (steps 7-9 in README):
    
-    ***why does ORC not require a table schema?***
-  
-12. Start an interactive session from Vertex AI workbench (steps 7-9 in README):
-
     ***place the screenshot of notebook here***
    
-13. Find and correct the error in spark-job.py
+14. Find and correct the error in spark-job.py
     The airflow dag has failed because of the error in spark-joby.py script - the target location for data pointed to
     bucket which did not exist. Bucket name has been changed as shown below. In result airflow task succeeded and data
     has been saved to tbd-2023z-1000-data bucket at tbd-2023z-1000-data/data/shakespeare.
