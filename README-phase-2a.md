@@ -126,7 +126,10 @@ GCP storage.
 It is worth to point out that files FINWIRE1967Q1*.csv are wasn't uploaded into bucket, but only files with 
 database import/export representation as they are used for creating hive tables.
 - [X] STATUS
+<br>
 9. Using SparkSQL answer: how many table were created in each layer?
+
+
 ```
 databases = spark.sql("show databases").rdd.map(lambda x : x[0]).collect()
 number_of_tables = []
