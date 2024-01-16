@@ -122,8 +122,10 @@ GCP storage.
 - upload_files: Manages the uploading of files to the designated Google Cloud Storage stage.
 - load_csv: Facilitates the loading of CSV files into Spark DataFrames.
 <br>
-- Overview of data loaded into bucket:
+- Overview of data loaded into bucket:  
+
 ![batch_3_ls](/doc/figures/bucket_structure.png)
+
 It is worth to point out that files FINWIRE1967Q1*.csv are wasn't uploaded into bucket, but only files with 
 database import/export representation as they are used for creating hive tables.
 - [X] STATUS
