@@ -189,7 +189,7 @@ statistics.show()
     HAVING cnt > 1
   ```
 
-11. In main.tf update
+11. In main.tf update  DONE
    ```
    dbt_git_repo            = "https://github.com/mwiewior/tbd-tpc-di.git"
    dbt_git_repo_branch     = "main"
