@@ -148,6 +148,18 @@ statistics.show()
 10. Add some 3 more [dbt tests](https://docs.getdbt.com/docs/build/tests) and explain what you are testing. ***Add new tests to your repository.***
 
    ***Code and description of your tests***
+  fact_cash_balance_registered_customer.sql - test to check if every customer having account in fact-cash_balances table is registered in dim_customer.
+  ```sql
+    SELECT DISTINCT fcb.sk_customer_id
+    FROM 
+        {{ ref('fact_cash_balances') }} fcb
+    LEFT JOIN 
+        {{ ref('dim_customer') }} dc
+    ON 
+        fcb.sk_customer_id = dc.sk_customer_id
+    WHERE
+        dc.sk_customer_id IS NULL
+  ```
 
 11. In main.tf update
    ```
