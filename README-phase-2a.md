@@ -147,8 +147,8 @@ statistics.show()
 - [X] STATUS
 10. Add some 3 more [dbt tests](https://docs.getdbt.com/docs/build/tests) and explain what you are testing. ***Add new tests to your repository.***
 
-   ***Code and description of your tests***
-  fact_cash_balance_registered_customer.sql - test to check if every customer having account in fact-cash_balances table is registered in dim_customer.
+   ***Code and description of your tests***  
+  **fact_cash_balance_registered_customer.sql** - test to check if every customer having account in fact_cash_balances table is registered in dim_customer.
   ```sql
     SELECT DISTINCT fcb.sk_customer_id
     FROM 
@@ -159,6 +159,28 @@ statistics.show()
         fcb.sk_customer_id = dc.sk_customer_id
     WHERE
         dc.sk_customer_id IS NULL
+  ```
+    **fact_trade__registered_in_dim_broker.sql** - test to check if every broker having trades in fact_trade table is registered in dim_broker.
+  ```sql
+    SELECT DISTINCT ft.sk_broker_id
+    FROM 
+        {{ ref('fact_trade') }} ft
+    LEFT JOIN 
+        {{ ref('dim_broker') }} db
+    ON 
+        ft.sk_broker_id = db.sk_broker_id
+    WHERE
+        db.sk_broker_id IS NULL
+  ```
+
+  **fact_trade__unique_trade.sql** - test to check if every sk_account_id is unique in dim_account 
+  ```sql
+    SELECT 
+        sk_account_id, 
+        count(*) cnt
+    FROM {{ ref('dim_account') }} 
+    GROUP BY sk_account_id
+    HAVING cnt > 1
   ```
 
 11. In main.tf update
