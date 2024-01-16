@@ -124,7 +124,8 @@ GCP storage.
 <br>
 - Overview of data loaded into bucket:  
 
-![batch_3_ls](/doc/figures/bucket_structure.png)
+![image](https://github.com/karpinskiJ/tbd-2023z-phase1_gr3/assets/83401763/385ff540-a583-470d-8931-cc25c365365d)
+
 
 It is worth to point out that files FINWIRE1967Q1*.csv are wasn't uploaded into bucket, but only files with 
 database import/export representation as they are used for creating hive tables.
