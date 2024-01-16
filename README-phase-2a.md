@@ -160,7 +160,9 @@ statistics.show()
     WHERE
         dc.sk_customer_id IS NULL
   ```
+  
     **fact_trade__registered_in_dim_broker.sql** - test to check if every broker having trades in fact_trade table is registered in dim_broker.
+      
   ```sql
     SELECT DISTINCT ft.sk_broker_id
     FROM 
@@ -173,7 +175,8 @@ statistics.show()
         db.sk_broker_id IS NULL
   ```
 
-  **fact_trade__unique_trade.sql** - test to check if every sk_account_id is unique in dim_account 
+  **fact_trade__unique_trade.sql** - test to check if every sk_account_id is unique in dim_account.
+ 
   ```sql
     SELECT 
         sk_account_id, 
