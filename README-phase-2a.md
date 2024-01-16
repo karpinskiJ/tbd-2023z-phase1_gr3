@@ -45,7 +45,8 @@ the running instance of your Vertex AI Workbench
 - [X] STATUS
 5. In `tpc-di-setup.ipynb` modify cell under section ***Clone tbd-tpc-di repo***:
 
-   a)first, fork https://github.com/mwiewior/tbd-tpc-di.git to your github organization.
+   a)first, fork https://github.com/mwiewior/tbd-tpc-di.git to your github organization.  
+  Link to forked repo: https://github.com/karpinskiJ/tbd-tpc-di_gr3
 
    b)create new branch (e.g. 'notebook') in your fork of tbd-tpc-di and modify profiles.yaml by commenting following lines:
    ```  
@@ -92,9 +93,10 @@ the running instance of your Vertex AI Workbench
    The generator was meant to download raw data for tpc-di tests. In first place data was downloaded to temporary location <br>
    /tmp/tpc-di. Downloaded data was divided into 3 batches. Each of them contained files in following formats: <br>
 -   .txt 
--  application/octet-stream // database  import export type
+-  application/octet-stream 
 - .xml 
-- .csv 
+- .csv  
+The various formats of loaded data are also goal of tpc-di tests, to check how different formats affect performance of warehouse.
 <br>
 The root structure of downloaded data is presented below: <br>
 
@@ -126,9 +128,6 @@ GCP storage.
 
 ![image](https://github.com/karpinskiJ/tbd-2023z-phase1_gr3/assets/83401763/385ff540-a583-470d-8931-cc25c365365d)
 
-
-It is worth to point out that files FINWIRE1967Q1*.csv are wasn't uploaded into bucket, but only files with 
-database import/export representation as they are used for creating hive tables.
 - [X] STATUS
 <br>
 9. Using SparkSQL answer: how many table were created in each layer?
