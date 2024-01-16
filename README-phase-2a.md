@@ -161,7 +161,7 @@ statistics.show()
         dc.sk_customer_id IS NULL
   ```
   
-    **fact_trade__registered_in_dim_broker.sql** - test to check if every broker having trades in fact_trade table is registered in dim_broker.
+  **fact_trade__registered_in_dim_broker.sql** - test to check if every broker having trades in fact_trade table is registered in dim_broker.
       
   ```sql
     SELECT DISTINCT ft.sk_broker_id
