@@ -97,6 +97,7 @@ the running instance of your Vertex AI Workbench
 - .csv 
 <br>
 The root structure of downloaded data is presented below: <br>
+
 ![batch_1_ls](/doc/figures/root_structure.png)
 
 Largest in size, Batch1 consumes approximately 940 MiB of storage, primarily comprising CSV files. CSV, a common format for data storage, is widely employed for data import/export in databases. In these files, each line corresponds to a data record, and fields, separated by commas, denote attributes of the record.
