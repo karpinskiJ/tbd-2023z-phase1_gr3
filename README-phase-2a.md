@@ -45,7 +45,8 @@ the running instance of your Vertex AI Workbench
 - [X] STATUS
 5. In `tpc-di-setup.ipynb` modify cell under section ***Clone tbd-tpc-di repo***:
 
-   a)first, fork https://github.com/mwiewior/tbd-tpc-di.git to your github organization.
+   a)first, fork https://github.com/mwiewior/tbd-tpc-di.git to your github organization.  
+  Link to forked repo: https://github.com/karpinskiJ/tbd-tpc-di_gr3
 
    b)create new branch (e.g. 'notebook') in your fork of tbd-tpc-di and modify profiles.yaml by commenting following lines:
    ```  
@@ -92,11 +93,13 @@ the running instance of your Vertex AI Workbench
    The generator was meant to download raw data for tpc-di tests. In first place data was downloaded to temporary location <br>
    /tmp/tpc-di. Downloaded data was divided into 3 batches. Each of them contained files in following formats: <br>
 -   .txt 
--  application/octet-stream // database  import export type
+-  application/octet-stream 
 - .xml 
-- .csv 
+- .csv  
+The various formats of loaded data are also goal of tpc-di tests, to check how different formats affect performance of warehouse.
 <br>
 The root structure of downloaded data is presented below: <br>
+
 ![batch_1_ls](/doc/figures/root_structure.png)
 
 Largest in size, Batch1 consumes approximately 940 MiB of storage, primarily comprising CSV files. CSV, a common format for data storage, is widely employed for data import/export in databases. In these files, each line corresponds to a data record, and fields, separated by commas, denote attributes of the record.
@@ -109,7 +112,7 @@ Batch1: 15,980,433 records
 Batch2: 67,451 records
 Batch3: 67,381 records
 
-![batch_1_ls](/doc/figures/batch_1_ls.png)
+![batch_2_ls](/doc/figures/batch_1_ls.png)
 
 - [X] STATUS
 8. Analyze tpcdi.py. What happened in the loading stage?
@@ -121,10 +124,10 @@ GCP storage.
 - upload_files: Manages the uploading of files to the designated Google Cloud Storage stage.
 - load_csv: Facilitates the loading of CSV files into Spark DataFrames.
 <br>
-- Overview of data loaded into bucket:
-![batch_1_ls](/doc/figures/bucket_structure.png)
-It is worth to point out that files FINWIRE1967Q1*.csv are wasn't uploaded into bucket, but only files with 
-database import/export representation as they are used for creating hive tables.
+- Overview of data loaded into bucket:  
+
+![image](https://github.com/karpinskiJ/tbd-2023z-phase1_gr3/assets/83401763/385ff540-a583-470d-8931-cc25c365365d)
+
 - [X] STATUS
 <br>
 9. Using SparkSQL answer: how many table were created in each layer?
@@ -147,9 +150,46 @@ statistics.show()
 - [X] STATUS
 10. Add some 3 more [dbt tests](https://docs.getdbt.com/docs/build/tests) and explain what you are testing. ***Add new tests to your repository.***
 
-   ***Code and description of your tests***
+   ***Code and description of your tests***  
+  **fact_cash_balance_registered_customer.sql** - test to check if every customer having account in fact_cash_balances table is registered in dim_customer.
+  ```sql
+    SELECT DISTINCT fcb.sk_customer_id
+    FROM 
+        {{ ref('fact_cash_balances') }} fcb
+    LEFT JOIN 
+        {{ ref('dim_customer') }} dc
+    ON 
+        fcb.sk_customer_id = dc.sk_customer_id
+    WHERE
+        dc.sk_customer_id IS NULL
+  ```
+  
+  **fact_trade__registered_in_dim_broker.sql** - test to check if every broker having trades in fact_trade table is registered in dim_broker.
+      
+  ```sql
+    SELECT DISTINCT ft.sk_broker_id
+    FROM 
+        {{ ref('fact_trade') }} ft
+    LEFT JOIN 
+        {{ ref('dim_broker') }} db
+    ON 
+        ft.sk_broker_id = db.sk_broker_id
+    WHERE
+        db.sk_broker_id IS NULL
+  ```
 
-11. In main.tf update
+  **fact_trade__unique_trade.sql** - test to check if every sk_account_id is unique in dim_account.
+ 
+  ```sql
+    SELECT 
+        sk_account_id, 
+        count(*) cnt
+    FROM {{ ref('dim_account') }} 
+    GROUP BY sk_account_id
+    HAVING cnt > 1
+  ```
+
+11. In main.tf update  DONE
    ```
    dbt_git_repo            = "https://github.com/mwiewior/tbd-tpc-di.git"
    dbt_git_repo_branch     = "main"
@@ -159,3 +199,4 @@ statistics.show()
 12. Redeploy infrastructure and check if the DAG finished with no errors:
 
 ***The screenshot of Apache Aiflow UI***
+![image](https://github.com/karpinskiJ/tbd-2023z-phase1_gr3/assets/83401763/9a666f3e-3701-4c91-a314-191493e74309)
