@@ -109,7 +109,7 @@ Batch1: 15,980,433 records
 Batch2: 67,451 records
 Batch3: 67,381 records
 
-![batch_1_ls](/doc/figures/batch_1_ls.png)
+![batch_2_ls](/doc/figures/batch_1_ls.png)
 
 - [X] STATUS
 8. Analyze tpcdi.py. What happened in the loading stage?
@@ -122,7 +122,7 @@ GCP storage.
 - load_csv: Facilitates the loading of CSV files into Spark DataFrames.
 <br>
 - Overview of data loaded into bucket:
-![batch_1_ls](/doc/figures/bucket_structure.png)
+![batch_3_ls](/doc/figures/bucket_structure.png)
 It is worth to point out that files FINWIRE1967Q1*.csv are wasn't uploaded into bucket, but only files with 
 database import/export representation as they are used for creating hive tables.
 - [X] STATUS
@@ -196,3 +196,4 @@ statistics.show()
 12. Redeploy infrastructure and check if the DAG finished with no errors:
 
 ***The screenshot of Apache Aiflow UI***
+![image](https://github.com/karpinskiJ/tbd-2023z-phase1_gr3/assets/83401763/9a666f3e-3701-4c91-a314-191493e74309)
